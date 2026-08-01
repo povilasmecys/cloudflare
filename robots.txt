@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://povilasmecys.com/sitemap.xml
