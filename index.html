@@ -63,7 +63,7 @@
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap: clamp(.5rem, 2vh, 1.6rem);
+    gap: clamp(.4rem, 1.6vh, 1.2rem);
     padding: 1.4vh 6vw;
     text-align:center;
   }
@@ -71,10 +71,11 @@
   .text-col{
     position:relative;
     z-index:2;
+    flex:none;
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap: clamp(.42rem, 1.4vmin, .95rem);
+    gap: clamp(.35rem, 1.1vmin, .75rem);
     min-width:0;
   }
 
@@ -87,10 +88,10 @@
     color:var(--paper);
     font-family:var(--ff-mono);
     font-weight:500;
-    font-size:clamp(.62rem, 1.5vmin, .8rem);
+    font-size:clamp(.56rem, 1.3vmin, .74rem);
     letter-spacing:.1em;
     text-transform:uppercase;
-    padding:.55em 1em;
+    padding:.5em .95em;
     border-radius:999px;
     opacity:0;
     animation: rise .7s cubic-bezier(.22,.9,.32,1) forwards .1s;
@@ -106,7 +107,7 @@
   h1.name{
     font-family:var(--ff-display);
     font-weight:600;
-    font-size: clamp(2rem, 7.4vmin, 4.6rem);
+    font-size: clamp(1.6rem, 5.8vmin, 3.6rem);
     line-height:.96;
     letter-spacing:-.01em;
     margin:0;
@@ -118,7 +119,7 @@
   .role{
     font-family:var(--ff-mono);
     font-weight:500;
-    font-size: clamp(.8rem, 2.1vmin, 1.08rem);
+    font-size: clamp(.7rem, 1.7vmin, .96rem);
     letter-spacing:.01em;
     margin:0;
     opacity:0;
@@ -131,8 +132,8 @@
     list-style:none; margin:0; padding:0;
     display:flex; flex-wrap:wrap;
     justify-content:center;
-    gap: .4em 1.3em;
-    font-size: clamp(.75rem, 1.8vmin, .96rem);
+    gap: .35em 1.2em;
+    font-size: clamp(.68rem, 1.5vmin, .86rem);
     opacity:0;
     animation: rise .7s cubic-bezier(.22,.9,.32,1) forwards .46s;
   }
@@ -154,7 +155,7 @@
   }
 
   .location{
-    font-size: clamp(.68rem, 1.6vmin, .84rem);
+    font-size: clamp(.6rem, 1.3vmin, .76rem);
     letter-spacing:.02em;
     margin:0;
     opacity:0;
@@ -164,12 +165,16 @@
   .photo-col{
     position:relative;
     z-index:1;
-    flex:none;
+    flex: 1 1 0%;
+    min-height:0;
     aspect-ratio: 838 / 1087;
-    height: clamp(90px, 34vh, 420px);
-    max-width: 80vw;
+    max-height: 660px;
+    max-width: 92vw;
   }
 
+  /* The source photo is hidden by default and only revealed if the particle
+     path is unavailable — visibility (not just opacity) guarantees it can
+     never paint for a frame before the script decides. */
   img.portrait-img{
     position:absolute;
     inset:0;
@@ -177,11 +182,11 @@
     height:100%;
     object-fit:contain;
     display:block;
+    visibility:hidden;
     opacity:0;
     transition: opacity 1s ease;
   }
-  img.portrait-img.shown{ opacity:1; }
-  img.portrait-img.dissolved{ opacity:0; transition: opacity 1.3s ease; }
+  img.portrait-img.shown{ visibility:visible; opacity:1; }
 
   canvas.portrait-canvas{
     position:absolute;
@@ -383,7 +388,7 @@
   // Region of the source photo containing the subject (with margin),
   // in the original image's own pixel coordinates (2500 x 1087).
   var CROP = { x:787, y:0, w:838, h:1087 };
-  var SAMPLE_W = 300;
+  var SAMPLE_W = 380;
   var SAMPLE_H = Math.round(SAMPLE_W * (CROP.h / CROP.w));
   var cloudAspect = CROP.w / CROP.h;
 
@@ -402,10 +407,11 @@
 
   function pickTier(){
     var boxH = wrap.getBoundingClientRect().height;
-    if(boxH < 140) return { key:'xs', stride:5, cap:800 };
-    if(boxH < 220) return { key:'sm', stride:4, cap:1300 };
-    if(boxH < 320) return { key:'md', stride:3, cap:2000 };
-    return { key:'lg', stride:2, cap:2900 };
+    if(boxH < 150) return { key:'xs', stride:5, cap:900 };
+    if(boxH < 240) return { key:'sm', stride:4, cap:1500 };
+    if(boxH < 360) return { key:'md', stride:3, cap:2300 };
+    if(boxH < 500) return { key:'lg', stride:2, cap:3300 };
+    return { key:'xl', stride:2, cap:4400 };
   }
 
   function buildParticles(){
@@ -493,6 +499,7 @@
     var originX = (w - renderW) / 2;
     var originY = (h - renderH) / 2;
     var driftAmp = Math.min(renderW, renderH) * 0.006;
+    var sizeScale = Math.max(0.55, Math.min(2.1, renderH / 480));
 
     for(var i=0;i<n;i++){
       var p = particles[i];
@@ -515,7 +522,7 @@
       if(dn){ ctx.moveTo(posX[j],posY[j]); ctx.lineTo(posX[dn.idx],posY[dn.idx]); }
     }
     ctx.strokeStyle = 'rgba(252,246,243,0.16)';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = Math.max(0.6, Math.min(1.4, sizeScale));
     ctx.stroke();
 
     var ALPHA_LEVELS = [0.55, 0.7, 0.85, 1.0];
@@ -524,8 +531,9 @@
       for(var k2=0;k2<n;k2++){
         var pk = particles[k2];
         if(pk.alphaBin !== binIdx) continue;
-        ctx.moveTo(posX[k2]+pk.r, posY[k2]);
-        ctx.arc(posX[k2], posY[k2], pk.r, 0, Math.PI*2);
+        var pr = pk.r * sizeScale;
+        ctx.moveTo(posX[k2]+pr, posY[k2]);
+        ctx.arc(posX[k2], posY[k2], pr, 0, Math.PI*2);
       }
       ctx.globalAlpha = ALPHA_LEVELS[binIdx];
       ctx.fillStyle = PAPER_STR;
@@ -549,8 +557,8 @@
   if(img.complete && img.naturalWidth) onImgReady();
 
   function onImgReady(){
-    img.classList.add('shown');
-
+    // Sample BEFORE revealing anything, so the source photo never flashes.
+    // The <img> is only ever shown if the particle path is unavailable.
     var off = document.createElement('canvas');
     off.width = SAMPLE_W; off.height = SAMPLE_H;
     var octx = off.getContext('2d');
@@ -559,16 +567,19 @@
       sampleData = octx.getImageData(0,0,SAMPLE_W,SAMPLE_H).data;
     } catch(e){
       // Pixel access blocked (e.g. page opened as a local file instead of
-      // served over http/https). The photo stays visible as-is — no particles,
-      // but nothing is ever left blank.
+      // served over http/https). Fall back to the photo so nothing is blank.
       console.warn('Particle portrait sampling unavailable, showing photo as-is:', e);
+      img.classList.add('shown');
       return;
     }
     buildParticles();
     if(particles.length){
+      // Draw one frame before revealing, so the canvas is never shown empty.
+      draw(performance.now());
       canvas.classList.add('ready');
-      img.classList.add('dissolved');
       requestAnimationFrame(frame);
+    } else {
+      img.classList.add('shown');
     }
   }
 
