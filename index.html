@@ -1,1 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ff5133">
+<title>Povilas Mečys — Front-End &amp; UI/UX Designer</title>
+<meta name="description" content="Povilas Mečys, Front-End &amp; UI/UX Designer based in Providence, RI. New site in progress — say hello in the meantime.">
+<meta name="author" content="Povilas Mečys">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://povilasmecys.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Povilas Mečys — Front-End &amp; UI/UX Designer">
+<meta property="og:description" content="New site in progress. Say hello in the meantime.">
+<meta property="og:image" content="https://povilasmecys.com/povilas-mecys.jpg">
+<meta property="og:url" content="https://povilasmecys.com/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --coral: hsl(5 100% 62%);
+    --coral-deep: hsl(6 88% 46%);
+    --ink: hsl(228 45% 12%);
+    --paper: hsl(20 60% 97%);
+    --ff-display: 'IBM Plex Sans', sans-serif;
+    --ff-mono: 'IBM Plex Mono', monospace;
+  }
 
+  *{ box-sizing:border-box; }
+
+  html,body{
+    height:100%;
+    margin:0;
+    overflow:hidden;
+    background:var(--coral);
+    color:var(--ink);
+    font-family:var(--ff-mono);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  ::selection{ background:var(--ink); color:var(--paper); }
+
+  a{ color:inherit; }
+
+  canvas#particles{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+    pointer-events:none;
+  }
+
+  .hero{
+    position:relative;
+    z-index:1;
+    height:100vh;
+    height:100dvh;
+    width:100vw;
+    display:grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items:stretch;
+  }
+
+  .text-col{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap: clamp(.55rem, 1.7vmin, 1.05rem);
+    padding: 6vmin 6vw;
+    min-width:0;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:.6em;
+    width:fit-content;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--ff-mono);
+    font-weight:500;
+    font-size:clamp(.62rem, 1.5vmin, .8rem);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    padding:.55em 1em;
+    border-radius:999px;
+    opacity:0;
+    animation: rise .7s cubic-bezier(.22,.9,.32,1) forwards .1s;
+  }
+
+  .eyebrow .dot{
+    width:.5em; height:.5em; border-radius:50%;
+    background:var(--coral);
+    flex:none;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+
+  h1.name{
+    font-family:var(--ff-display);
+    font-weight:600;
+    font-size: clamp(2.1rem, 8.6vmin, 5.1rem);
+    line-height:.96;
+    letter-spacing:-.01em;
+    margin:0;
+    opacity:0;
+    animation: rise .7s cubic-bezier(.22,.9,.32,1) forwards .22s;
+  }
+  h1.name strong{ font-weight:700; display:block; }
+
+  .role{
+    font-family:var(--ff-mono);
+    font-weight:500;
+    font-size: clamp(.82rem, 2.3vmin, 1.12rem);
+    letter-spacing:.01em;
+    margin:0;
+    opacity:0;
+    animation: rise .7s cubic-bezier(.22,.9,.32,1) forwards .34s;
+  }
+  .role .sep{ color:var(--coral-deep); margin:0 .45em; opacity:.7; }
+  .role .cursor{ display:inline-block; margin-left:.1em; animation: blink 1.1s steps(1) infinite; }
+
+  ul.contact{
+    list-style:none; margin:0; padding:0;
+    display:flex; flex-wrap:wrap;
+    gap: .4em 1.3em;
+    font-size: clamp(.76rem, 1.9vmin, .98rem);
+    opacity:0;
+    animation: rise .7s cubic-bezier(.22,.9,.32,1) forwards .46s;
+  }
+  ul.contact a{
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+    padding-bottom:2px;
+    transition: border-color .2s ease, opacity .2s ease;
+  }
+  ul.contact a:hover,
+  ul.contact a:focus-visible{
+    border-color: var(--ink);
+    opacity:.72;
+  }
+  ul.contact a:focus-visible{
+    outline: 2px solid var(--ink);
+    outline-offset: 4px;
+    border-radius:2px;
+  }
+
+  .location{
+    font-size: clamp(.68rem, 1.6vmin, .84rem);
+    letter-spacing:.02em;
+    margin:0;
+    opacity:0;
+    animation: rise .7s cubic-bezier(.22,.9,.32,1) forwards .56s, settle 0s linear .56s forwards;
+  }
+
+  .photo-col{
+    position:relative;
+    z-index:1;
+  }
+
+  canvas.portrait-canvas{
+    display:block;
+    width:100%;
+    height:100%;
+    opacity:0;
+    transition: opacity 1.1s ease;
+  }
+  canvas.portrait-canvas.ready{ opacity:1; }
+
+  @keyframes rise{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes settle{ to{ opacity:.62; } }
+  @keyframes pulse{
+    0%,100%{ transform:scale(1); opacity:1; }
+    50%{ transform:scale(1.6); opacity:.35; }
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  /* ---- Sound toggle ---- */
+  .sound-toggle{
+    position:fixed;
+    right: max(5vw, 1.2rem);
+    bottom: max(4vh, 1.2rem);
+    z-index:5;
+    display:inline-flex;
+    align-items:center;
+    gap:.6em;
+    background: hsla(20,60%,97%,.14);
+    border:1px solid hsla(228,45%,12%,.35);
+    color:var(--ink);
+    font-family:var(--ff-mono);
+    font-weight:500;
+    font-size: clamp(.6rem, 1.4vmin, .74rem);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:.6em .95em;
+    border-radius:999px;
+    cursor:pointer;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    transition: background .25s ease, color .25s ease, border-color .25s ease;
+    opacity:0;
+    animation: rise .7s cubic-bezier(.22,.9,.32,1) forwards .7s;
+  }
+  .sound-toggle:hover{ border-color:var(--ink); }
+  .sound-toggle:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
+  .sound-toggle.is-on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+  .bars{ display:inline-flex; align-items:flex-end; gap:2px; height:10px; }
+  .bars i{ display:block; width:2px; background:currentColor; height:4px; border-radius:1px; transform-origin:bottom; font-style:normal; }
+  .sound-toggle.is-on .bars i{ animation: eq .9s ease-in-out infinite; }
+  .bars i:nth-child(1){ animation-delay:0s; }
+  .bars i:nth-child(2){ animation-delay:.15s; height:6px; }
+  .bars i:nth-child(3){ animation-delay:.3s; height:5px; }
+  @keyframes eq{ 0%,100%{ transform:scaleY(1); } 50%{ transform:scaleY(2.1); } }
+
+  /* ---- Portrait / narrow devices: stack layout ---- */
+  @media (max-aspect-ratio: 1/1){
+    .hero{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap: clamp(.9rem, 3.2vh, 2.1rem);
+      padding: 4vh 6vw;
+    }
+    .photo-col{
+      order:-1;
+      flex:none;
+      width: clamp(112px, 36vmin, 230px);
+      height: clamp(112px, 36vmin, 230px);
+    }
+    .text-col{
+      padding:0;
+      align-items:center;
+      text-align:center;
+    }
+    ul.contact{ justify-content:center; }
+    h1.name{ font-size: clamp(1.9rem, 10.5vmin, 3.3rem); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .eyebrow,h1.name,.role,ul.contact,.location,.sound-toggle{ animation:none; opacity:1; }
+    .location{ opacity:.62; }
+    .eyebrow .dot,.role .cursor,.bars i{ animation:none; }
+    canvas#particles{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles" aria-hidden="true"></canvas>
+
+<main class="hero">
+  <div class="text-col">
+    <p class="eyebrow"><span class="dot"></span>New site in progress</p>
+    <h1 class="name">Povilas<strong>Mečys</strong></h1>
+    <p class="role">Front-End Designer<span class="sep">/</span>UI–UX Designer<span class="cursor">_</span></p>
+    <ul class="contact">
+      <li><a href="mailto:me@povilasmecys.com">me@povilasmecys.com</a></li>
+      <li><a href="tel:4018306509">401 830 6509</a></li>
+    </ul>
+    <p class="location">Providence, RI</p>
+  </div>
+  <div class="photo-col" role="img" aria-label="Ambient particle portrait of Povilas Mečys">
+    <canvas class="portrait-canvas" aria-hidden="true"></canvas>
+  </div>
+</main>
+
+<button type="button" class="sound-toggle" id="soundToggle" aria-pressed="false" aria-label="Toggle ambient lo-fi sound">
+  <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>
+  <span class="sound-label">Sound</span>
+</button>
+
+<script>
+/* ---------------------------------------------------------------
+   Ambient background particle field (constellation over the hero)
+--------------------------------------------------------------- */
+(function(){
+  var canvas = document.getElementById('particles');
+  var ctx = canvas.getContext('2d');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion) return;
+
+  var w, h, dpr, particles;
+  var mouse = { x:null, y:null };
+
+  function spawn(){
+    return {
+      x: Math.random()*w,
+      y: Math.random()*h,
+      vx: (Math.random()-.5)*0.26,
+      vy: (Math.random()-.5)*0.26,
+      r: Math.random()*1.5+0.6
+    };
+  }
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio||1, 2);
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = Math.round(w*dpr);
+    canvas.height = Math.round(h*dpr);
+    canvas.style.width = w+'px';
+    canvas.style.height = h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    var count = Math.max(28, Math.min(85, Math.round((w*h)/17000)));
+    particles = [];
+    for(var i=0;i<count;i++) particles.push(spawn());
+  }
+
+  function step(){
+    ctx.clearRect(0,0,w,h);
+
+    for(var i=0;i<particles.length;i++){
+      var p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+
+      if(mouse.x!==null){
+        var dx = p.x-mouse.x, dy = p.y-mouse.y;
+        var d2 = dx*dx+dy*dy;
+        if(d2 < 16000){
+          var f = (16000-d2)/16000*0.018;
+          p.x += dx*f; p.y += dy*f;
+        }
+      }
+
+      if(p.x < -12) p.x = w+12;
+      if(p.x > w+12) p.x = -12;
+      if(p.y < -12) p.y = h+12;
+      if(p.y > h+12) p.y = -12;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = 'hsla(20,100%,97%,0.55)';
+      ctx.fill();
+    }
+
+    var maxD = 118, maxD2 = maxD*maxD;
+    for(var a=0;a<particles.length;a++){
+      for(var b=a+1;b<particles.length;b++){
+        var pa = particles[a], pb = particles[b];
+        var ddx = pa.x-pb.x, ddy = pa.y-pb.y;
+        var dist2 = ddx*ddx+ddy*ddy;
+        if(dist2 < maxD2){
+          var dist = Math.sqrt(dist2);
+          ctx.strokeStyle = 'hsla(20,100%,97%,' + (0.22*(1-dist/maxD)) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(pa.x, pa.y);
+          ctx.lineTo(pb.x, pb.y);
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  window.addEventListener('resize', resize);
+  window.addEventListener('pointermove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('pointerleave', function(){ mouse.x = null; mouse.y = null; });
+
+  resize();
+  requestAnimationFrame(step);
+})();
+
+/* ---------------------------------------------------------------
+   Portrait, digitised: the photo is sampled once into a field of
+   points (dark ones from hair/shadow, light ones from skin/highlight)
+   which then drift and breathe gently in place.
+--------------------------------------------------------------- */
+(function(){
+  var wrap = document.querySelector('.photo-col');
+  var canvas = document.querySelector('.portrait-canvas');
+  var ctx = canvas.getContext('2d');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Region of the source photo containing the subject (with margin),
+  // in the original image's own pixel coordinates (2500 x 1087).
+  var CROP = { x:787, y:0, w:838, h:1087 };
+  var SAMPLE_W = 300;
+  var SAMPLE_H = Math.round(SAMPLE_W * (CROP.h / CROP.w));
+  var cloudAspect = CROP.w / CROP.h;
+
+  var BG = [255,112,96];
+  var DIFF_THRESHOLD = 42;
+  var INK = [17,22,44];
+  var PAPER = [252,246,243];
+  var BIN_COLORS = [0,0.25,0.5,0.75,1].map(function(t){
+    var r = Math.round(INK[0]+(PAPER[0]-INK[0])*t);
+    var g = Math.round(INK[1]+(PAPER[1]-INK[1])*t);
+    var b = Math.round(INK[2]+(PAPER[2]-INK[2])*t);
+    return 'rgb('+r+','+g+','+b+')';
+  });
+
+  var sampleData = null;
+  var particles = [];
+  var neighborMap = new Map();
+  var currentTierKey = '';
+  var dpr = Math.min(window.devicePixelRatio||1, 2);
+  var posX = null, posY = null;
+
+  function pickTier(){
+    var stacked = window.matchMedia('(max-aspect-ratio: 1/1)').matches;
+    var iw = window.innerWidth;
+    if(stacked) return { key:'sm', stride:4, cap:1500 };
+    if(iw < 700) return { key:'ph-l', stride:4, cap:1400 };
+    if(iw < 1200) return { key:'md', stride:3, cap:2200 };
+    return { key:'lg', stride:2, cap:3400 };
+  }
+
+  function buildParticles(){
+    if(!sampleData) return;
+    var tier = pickTier();
+    if(tier.key === currentTierKey && particles.length) return;
+    currentTierKey = tier.key;
+
+    var list = [];
+    var stride = tier.stride;
+    var gx, gy = 0;
+    for(var y=0; y<SAMPLE_H; y+=stride){
+      gx = 0;
+      for(var x=0; x<SAMPLE_W; x+=stride){
+        var idx = (y*SAMPLE_W + x) * 4;
+        var r = sampleData[idx], g = sampleData[idx+1], b = sampleData[idx+2];
+        var diff = Math.abs(r-BG[0]) + Math.abs(g-BG[1]) + Math.abs(b-BG[2]);
+        if(diff > DIFF_THRESHOLD){
+          var lum = (0.2126*r + 0.7152*g + 0.0722*b) / 255;
+          var bin = Math.min(4, Math.max(0, Math.round(lum*4)));
+          list.push({
+            nx: x / SAMPLE_W,
+            ny: y / SAMPLE_H,
+            bin: bin,
+            gx: gx, gy: gy,
+            phaseX: Math.random()*Math.PI*2,
+            phaseY: Math.random()*Math.PI*2,
+            freqX: 0.15 + Math.random()*0.22,
+            freqY: 0.15 + Math.random()*0.22,
+            r: 0.7 + Math.random()*0.9
+          });
+        }
+        gx++;
+      }
+      gy++;
+    }
+
+    if(list.length > tier.cap){
+      var kept = [];
+      var n = list.length, cap = tier.cap;
+      var step = n / cap;
+      var acc = 0;
+      for(var i=0; i<n && kept.length<cap; i++){
+        if(i >= acc){ kept.push(list[i]); acc += step; }
+      }
+      list = kept;
+    }
+
+    var map = new Map();
+    for(var k=0;k<list.length;k++){ list[k].idx = k; map.set(list[k].gx+'_'+list[k].gy, list[k]); }
+
+    particles = list;
+    neighborMap = map;
+    posX = new Float32Array(particles.length);
+    posY = new Float32Array(particles.length);
+  }
+
+  function draw(t){
+    var rect = wrap.getBoundingClientRect();
+    var w = Math.max(1, Math.round(rect.width));
+    var h = Math.max(1, Math.round(rect.height));
+    var pxW = Math.round(w*dpr), pxH = Math.round(h*dpr);
+    if(canvas.width !== pxW || canvas.height !== pxH){
+      canvas.width = pxW; canvas.height = pxH;
+    }
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+
+    var n = particles.length;
+    if(!n) return;
+
+    var breathe = reduceMotion ? 1 : (1 + 0.012*Math.sin(t*0.00028));
+    var boxAspect = w / h;
+    var renderW, renderH;
+    if(boxAspect > cloudAspect){
+      renderW = w * breathe;
+      renderH = (w / cloudAspect) * breathe;
+    } else {
+      renderH = h * breathe;
+      renderW = (h * cloudAspect) * breathe;
+    }
+    var originX = (w - renderW) / 2;
+    var originY = (h - renderH) / 2;
+    var driftAmp = Math.min(renderW, renderH) * 0.006;
+
+    for(var i=0;i<n;i++){
+      var p = particles[i];
+      var baseX = originX + p.nx * renderW;
+      var baseY = originY + p.ny * renderH;
+      if(reduceMotion){
+        posX[i] = baseX; posY[i] = baseY;
+      } else {
+        posX[i] = baseX + Math.sin(t*0.0009*p.freqX*6 + p.phaseX) * driftAmp;
+        posY[i] = baseY + Math.cos(t*0.0009*p.freqY*6 + p.phaseY) * driftAmp;
+      }
+    }
+
+    ctx.beginPath();
+    for(var j=0;j<n;j++){
+      var pj = particles[j];
+      var rn = neighborMap.get((pj.gx+1)+'_'+pj.gy);
+      if(rn){ ctx.moveTo(posX[j],posY[j]); ctx.lineTo(posX[rn.idx],posY[rn.idx]); }
+      var dn = neighborMap.get(pj.gx+'_'+(pj.gy+1));
+      if(dn){ ctx.moveTo(posX[j],posY[j]); ctx.lineTo(posX[dn.idx],posY[dn.idx]); }
+    }
+    ctx.strokeStyle = 'rgba(17,22,44,0.09)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    for(var binIdx=0; binIdx<5; binIdx++){
+      ctx.beginPath();
+      for(var k2=0;k2<n;k2++){
+        var pk = particles[k2];
+        if(pk.bin !== binIdx) continue;
+        ctx.moveTo(posX[k2]+pk.r, posY[k2]);
+        ctx.arc(posX[k2], posY[k2], pk.r, 0, Math.PI*2);
+      }
+      ctx.fillStyle = BIN_COLORS[binIdx];
+      ctx.fill();
+    }
+  }
+
+  function frame(t){
+    draw(t);
+    if(!reduceMotion) requestAnimationFrame(frame);
+  }
+
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(buildParticles, 150);
+  });
+
+  var img = new Image();
+  img.onload = function(){
+    var off = document.createElement('canvas');
+    off.width = SAMPLE_W; off.height = SAMPLE_H;
+    var octx = off.getContext('2d');
+    octx.drawImage(img, CROP.x, CROP.y, CROP.w, CROP.h, 0, 0, SAMPLE_W, SAMPLE_H);
+    try{
+      sampleData = octx.getImageData(0,0,SAMPLE_W,SAMPLE_H).data;
+    } catch(e){
+      console.warn('Particle portrait sampling unavailable:', e);
+      return;
+    }
+    buildParticles();
+    canvas.classList.add('ready');
+    requestAnimationFrame(frame);
+  };
+  img.onerror = function(){ console.warn('Portrait image failed to load.'); };
+  img.src = 'povilas-mecys.jpg';
+})();
+
+/* ---------------------------------------------------------------
+   Generative lo-fi ambient audio (synthesised, no external files).
+   Off by default; toggled by the Sound button below.
+--------------------------------------------------------------- */
+(function(){
+  var btn = document.getElementById('soundToggle');
+  var ctx, master, isOn = false;
+  var chordTimer, plinkTimer, noiseSrc, lfo, padGain;
+  var SCALE = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+  var CHORDS = [
+    [130.81, 164.81, 196.00],
+    [110.00, 146.83, 174.61],
+    [123.47, 155.56, 196.00]
+  ];
+  var chordIdx = 0;
+
+  function noiseBuffer(){
+    var len = ctx.sampleRate * 2;
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var data = buf.getChannelData(0);
+    for(var i=0;i<len;i++) data[i] = Math.random()*2-1;
+    return buf;
+  }
+
+  function ensureCtx(){
+    if(!ctx){
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain();
+      master.gain.value = 0;
+      master.connect(ctx.destination);
+    }
+  }
+
+  function playChord(freqs){
+    var now = ctx.currentTime;
+    freqs.forEach(function(f){
+      var o = ctx.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(1, now+3);
+      g.gain.linearRampToValueAtTime(0, now+9);
+      o.connect(g); g.connect(padGain);
+      o.start(now); o.stop(now+9.3);
+    });
+  }
+
+  function loopChord(){
+    playChord(CHORDS[chordIdx % CHORDS.length]);
+    chordIdx++;
+    chordTimer = setTimeout(loopChord, 7000);
+  }
+
+  function ping(){
+    var now = ctx.currentTime;
+    var f = SCALE[Math.floor(Math.random()*SCALE.length)] * 2;
+    var o = ctx.createOscillator();
+    o.type = 'sine'; o.frequency.value = f;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(0.05, now+0.05);
+    g.gain.exponentialRampToValueAtTime(0.0001, now+2.4);
+    o.connect(g); g.connect(master);
+    o.start(now); o.stop(now+2.5);
+    plinkTimer = setTimeout(ping, 6000 + Math.random()*7000);
+  }
+
+  function start(){
+    ensureCtx();
+    if(ctx.state === 'suspended') ctx.resume();
+
+    padGain = ctx.createGain();
+    padGain.gain.value = 0.06;
+    var filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 900;
+    lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.07;
+    var lfoGain = ctx.createGain();
+    lfoGain.gain.value = 240;
+    lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
+    lfo.start();
+    padGain.connect(filter); filter.connect(master);
+    chordIdx = 0;
+    loopChord();
+
+    noiseSrc = ctx.createBufferSource();
+    noiseSrc.buffer = noiseBuffer();
+    noiseSrc.loop = true;
+    var bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = 2200; bp.Q.value = 0.7;
+    var noiseGain = ctx.createGain(); noiseGain.gain.value = 0.018;
+    noiseSrc.connect(bp); bp.connect(noiseGain); noiseGain.connect(master);
+    noiseSrc.start();
+
+    plinkTimer = setTimeout(ping, 4000);
+
+    master.gain.cancelScheduledValues(ctx.currentTime);
+    master.gain.linearRampToValueAtTime(0.6, ctx.currentTime + 1.4);
+  }
+
+  function stop(){
+    if(!ctx) return;
+    master.gain.cancelScheduledValues(ctx.currentTime);
+    master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.7);
+    clearTimeout(chordTimer);
+    clearTimeout(plinkTimer);
+    try{ lfo && lfo.stop(ctx.currentTime + 0.8); }catch(e){}
+    try{ noiseSrc && noiseSrc.stop(ctx.currentTime + 0.8); }catch(e){}
+  }
+
+  btn.addEventListener('click', function(){
+    isOn = !isOn;
+    if(isOn){ start(); } else { stop(); }
+    btn.classList.toggle('is-on', isOn);
+    btn.setAttribute('aria-pressed', String(isOn));
+  });
+})();
+</script>
+
+</body>
+</html>
